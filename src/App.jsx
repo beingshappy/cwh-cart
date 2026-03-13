@@ -21,6 +21,7 @@ import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
 import MobileNav from './components/layout/MobileNav'
 import BackgroundEffects from './components/layout/BackgroundEffects'
+import ScrollToTop from './components/layout/ScrollToTop'
 import AdminBackdoor from './components/ui/AdminBackdoor'
 import { useStore } from './store/useStore'
 
@@ -136,6 +137,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <div className="min-h-screen flex flex-col relative">
         <BackgroundEffects />
 
