@@ -136,7 +136,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-[#030a06] flex flex-col relative">
+      <div className="min-h-screen flex flex-col relative">
         <BackgroundEffects />
 
         <Navbar />

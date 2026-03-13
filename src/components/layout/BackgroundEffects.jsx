@@ -6,19 +6,18 @@ function ShootingStar({ delay, duration, top, left, angle }) {
   return (
     <motion.div
       className="absolute h-px bg-gradient-to-r from-transparent via-white to-transparent pointer-events-none"
-      style={{ top: `${top}%`, left: `${left}%`, width: 120, rotate: angle }}
-      initial={{ opacity: 0, x: 0, scaleX: 0 }}
+      style={{ top: `${top}%`, left: `${left}%`, width: 120, rotate: angle, willChange: 'transform' }}
+      initial={{ opacity: 0, x: 0 }}
       animate={{
-        opacity: [0, 1, 1, 0],
-        x: [0, 180],
-        scaleX: [0, 1, 1, 0],
+        opacity: [0, 1, 0],
+        x: [0, 200],
       }}
       transition={{
         duration,
         delay,
         repeat: Infinity,
-        repeatDelay: Math.random() * 8 + 6,
-        ease: 'easeOut',
+        repeatDelay: Math.random() * 8 + 10,
+        ease: 'linear',
       }}
     />
   )
@@ -35,16 +34,21 @@ function Orb({ color, size, x, y, blur, dur, delay, opacity = 0.18 }) {
         height: size,
         left: `${x}%`,
         top: `${y}%`,
-        filter: `blur(${blur}px)`,
+        filter: `blur(${blur}px)`, // Keep blur STATIC to prevent mobile flickering
         opacity,
+        willChange: 'transform, opacity',
       }}
       animate={{
-        x: [0, 60, -40, 30, 0],
-        y: [0, -50, 40, -30, 0],
-        scale: [1, 1.15, 0.9, 1.05, 1],
-        opacity: [opacity, opacity * 1.5, opacity * 0.7, opacity * 1.2, opacity],
+        x: [0, 30, -20, 0],
+        y: [0, -25, 15, 0],
+        opacity: [opacity, opacity * 1.2, opacity],
       }}
-      transition={{ duration: dur, delay, repeat: Infinity, ease: 'easeInOut' }}
+      transition={{ 
+        duration: dur, 
+        delay, 
+        repeat: Infinity, 
+        ease: 'easeInOut' 
+      }}
     />
   )
 }
@@ -60,16 +64,15 @@ function Aurora() {
           height: 360,
           top: '10%',
           background:
-            'linear-gradient(135deg, transparent 0%, hsl(145 60% 38% / 0.15) 30%, hsl(40 90% 55% / 0.12) 60%, transparent 100%)',
-          filter: 'blur(70px)',
+            'linear-gradient(135deg, transparent 0%, hsl(145 60% 38% / 0.12) 30%, hsl(40 90% 55% / 0.1) 60%, transparent 100%)',
+          filter: 'blur(60px)',
+          willChange: 'transform, opacity',
         }}
         animate={{
-          skewY: [-2, 2, -1, 3, -2],
-          scaleX: [1, 1.08, 0.96, 1.04, 1],
-          y: [0, -30, 20, -10, 0],
-          opacity: [0.8, 1, 0.9, 1, 0.8],
+          y: [0, -15, 0],
+          opacity: [0.95, 1, 0.95],
         }}
-        transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+        transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
       />
       {/* Aurora wave 2 */}
       <motion.div
@@ -78,16 +81,15 @@ function Aurora() {
           height: 280,
           top: '40%',
           background:
-            'linear-gradient(135deg, transparent 0%, hsl(220 70% 50% / 0.1) 20%, hsl(145 60% 38% / 0.12) 70%, transparent 100%)',
-          filter: 'blur(90px)',
+            'linear-gradient(135deg, transparent 0%, hsl(220 70% 50% / 0.08) 20%, hsl(145 60% 38% / 0.1) 70%, transparent 100%)',
+          filter: 'blur(80px)',
+          willChange: 'transform, opacity',
         }}
         animate={{
-          skewY: [3, -2, 4, -1, 3],
-          scaleX: [1, 0.94, 1.06, 0.98, 1],
-          y: [0, 25, -15, 20, 0],
-          opacity: [0.6, 1, 0.7, 0.9, 0.6],
+          y: [0, 10, 0],
+          opacity: [0.9, 1, 0.9],
         }}
-        transition={{ duration: 15, delay: 3, repeat: Infinity, ease: 'easeInOut' }}
+        transition={{ duration: 14, delay: 2, repeat: Infinity, ease: 'linear' }}
       />
     </div>
   )
@@ -111,8 +113,9 @@ function ParticleField() {
     resize()
     window.addEventListener('resize', resize)
 
-    // Spawn particles
-    const count = Math.min(60, Math.floor(window.innerWidth / 20))
+    // Spawn particles — optimized for mobile
+    const count = Math.min(window.innerWidth < 768 ? 25 : 60, Math.floor(window.innerWidth / 25))
+    const maxDist = window.innerWidth < 768 ? 70 : 100
     for (let i = 0; i < count; i++) {
       particles.push({
         x: Math.random() * canvas.width,
@@ -147,9 +150,9 @@ function ParticleField() {
           const dx = particles[i].x - particles[j].x
           const dy = particles[i].y - particles[j].y
           const dist = Math.sqrt(dx * dx + dy * dy)
-          if (dist < 100) {
+          if (dist < maxDist) {
             ctx.beginPath()
-            ctx.strokeStyle = `rgba(255,255,255,${0.04 * (1 - dist / 100)})`
+            ctx.strokeStyle = `rgba(255,255,255,${0.04 * (1 - dist / maxDist)})`
             ctx.lineWidth = 0.5
             ctx.moveTo(particles[i].x, particles[i].y)
             ctx.lineTo(particles[j].x, particles[j].y)
@@ -200,7 +203,7 @@ function Vignette() {
       className="absolute inset-0 pointer-events-none"
       style={{
         background:
-          'radial-gradient(ellipse 70% 70% at 50% 50%, transparent 30%, rgba(0,0,0,0.55) 100%)',
+          'radial-gradient(ellipse 70% 70% at 50% 50%, transparent 30%, rgba(0,0,0,0.55) 100%)'
       }}
     />
   )
@@ -209,15 +212,13 @@ function Vignette() {
 /* ─── Noise Texture ─────────────────────────────────────── */
 function Noise() {
   return (
-    <motion.div
+    <div
       className="absolute inset-0 pointer-events-none"
       style={{
-        opacity: 0.025,
+        opacity: 0.018,
         backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-        backgroundSize: '180px',
+        backgroundSize: '150px',
       }}
-      animate={{ backgroundPosition: ['0% 0%', '100% 100%'] }}
-      transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
     />
   )
 }
@@ -235,32 +236,24 @@ export default function BackgroundEffects() {
 
   return (
     <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none" aria-hidden="true">
-      {/* Deep dark base */}
-      <div className="absolute inset-0 bg-[#030a06]" />
-
-      {/* Particle constellation */}
-      <ParticleField />
-
-      {/* Aurora bands */}
+      {/* 1. Deep Atmosphere (Aurora) */}
       <Aurora />
 
-      {/* Large ambient orbs — increased lighting intensity */}
-      <Orb color="radial-gradient(circle, hsl(145,60%,38%), transparent)" size={800} x={-10} y={-5} blur={150} dur={18} delay={0} opacity={0.25} />
-      <Orb color="radial-gradient(circle, hsl(40,90%,55%), transparent)" size={600} x={75} y={10} blur={120} dur={22} delay={4} opacity={0.18} />
-      <Orb color="radial-gradient(circle, hsl(220,70%,55%), transparent)" size={500} x={50} y={70} blur={110} dur={16} delay={8} opacity={0.15} />
-      <Orb color="radial-gradient(circle, hsl(145,60%,30%), transparent)" size={450} x={20} y={60} blur={100} dur={20} delay={5} opacity={0.2} />
-      <Orb color="radial-gradient(circle, hsl(300,50%,40%), transparent)" size={400} x={85} y={55} blur={110} dur={25} delay={12} opacity={0.12} />
+      {/* 2. Fluid Orbs */}
+      <Orb color="radial-gradient(circle, hsl(145,60%,38%), transparent)" size={800} x={-10} y={-5} blur={150} dur={18} delay={0} opacity={0.2} />
+      <Orb color="radial-gradient(circle, hsl(40,90%,55%), transparent)" size={600} x={75} y={10} blur={120} dur={22} delay={4} opacity={0.15} />
+      <Orb color="radial-gradient(circle, hsl(220,70%,55%), transparent)" size={500} x={50} y={70} blur={110} dur={16} delay={8} opacity={0.12} />
+      <Orb color="radial-gradient(circle, hsl(145,60%,30%), transparent)" size={450} x={20} y={60} blur={100} dur={20} delay={5} opacity={0.18} />
 
-      {/* Shooting stars */}
+      {/* 3. Particle Field */}
+      <ParticleField />
+
+      {/* 4. Cosmic Events (Shooting Stars) */}
       {stars.map((s, i) => <ShootingStar key={i} {...s} />)}
 
-      {/* Grid overlay */}
+      {/* 5. Cinematic Texture Layers */}
       <GridOverlay />
-
-      {/* Vignette */}
       <Vignette />
-
-      {/* Film grain */}
       <Noise />
     </div>
   )
